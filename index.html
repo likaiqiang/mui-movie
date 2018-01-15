@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>首页</title>
+		<script src="js/mui.min.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		
+		<style>
+			html,
+			body {
+				background-color: white;
+			}
+			.mui-content {
+				background-color: white;
+				overflow: hidden;
+			}
+			
+			/*.wrap-search {
+				margin: 15px;
+				border-radius: 5px;
+			}*/
+			.wrap-search {
+				margin: 15px;
+				background: #E6E6E6;
+				height: 30px;
+				border-radius: 5px;
+				text-align: center;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-content">
+			<div class="wrap-search" id="search">
+				<span class="mui-icon mui-icon-search" style="line-height: 30px;color: #AAAAAA;font-size: 16px;"></span>
+				<span style="line-height: 30px;color: #AAAAAA;font-size: 14px;">电影/电视剧/影人</span>
+			</div>
+		</div>
+
+		<script src="js/util.js"></script>
+		<script type="text/javascript">
+			!(function() {
+				mui.init({
+					swipeBack: true, //启用右滑关闭功能
+					subpages:[
+						{
+							url:'./html/refresh-subpages.html',
+							id:'refresh-subpages.html',
+							styles:{
+								top:"50px",
+								bottom:"50px"
+							}
+						}
+					]
+				})
+				mui.plusReady(function() {
+					var self = plus.webview.currentWebview()
+					var aniShow = {}
+					var search = document.getElementById('search')
+					search.addEventListener('click',function(){
+						console.log('tap')
+						mui.openWindow({
+							id:'search.html',
+							url:'./html/search.html'
+						})
+					})
+					util.initSubpage(aniShow);
+					var nview = plus.nativeObj.View.getViewById('tabBar'),
+						activePage = plus.webview.currentWebview(),
+						targetPage,
+						subpages = util.options.subpages,
+						pageW = window.innerWidth,
+						currIndex = 0;
+
+					nview.addEventListener('click', function(e) {
+						var clientX = e.clientX;
+
+						if(clientX > 0 && clientX <= parseInt(pageW * 0.33)) {
+							currIndex = 0;
+						} else if(clientX > parseInt(pageW * 0.33) && clientX <= parseInt(pageW * 0.76)) {
+							currIndex = 1;
+						} else {
+							currIndex = 2
+						}
+						// 匹配对应tab窗口	
+						if(currIndex > 0) {
+							targetPage = plus.webview.getWebviewById(subpages[currIndex - 1]);
+						} else {
+							targetPage = plus.webview.currentWebview();
+						}
+
+						if(targetPage == activePage) {
+							return;
+						}
+
+						util.toggleNview(currIndex);
+						// 子页面切换
+						util.changeSubpage(targetPage, activePage, aniShow);
+						//更新当前活跃的页面
+						activePage = targetPage;
+					});
+				});
+				//				mui('.mui-scroll-wrapper').scroll({})
+				function refreshUp() {
+					mui.getJSON('https://api.douban.com/v2/movie/in_theaters', {
+						start: vm.movie.length,
+						count: 10
+					}, function(res) {
+						vm.movie = vm.movie.concat(processData(res.subjects))
+						mui('#refreshContainer').pullRefresh().endPullupToRefresh(vm.movie.length > res.total);
+					})
+				}
+
+				function refreshDown() {
+					mui.getJSON('https://api.douban.com/v2/movie/in_theaters', {
+
+					}, function(res) {
+						console.log('down')
+						vm.movie = []
+						vm.movie = processData(res.subjects)
+						mui('#refreshContainer').pullRefresh().endPulldown();
+						//						mui('#refreshContainer').pullRefresh().refresh(true);
+					})
+				}
+
+				function processData(data) {
+					data.forEach(function(item, index) {
+						item.genres = item.genres.join('/')
+						item.directors = item.directors.map(function(ele, i) {
+							return ele.name
+						}).join('/')
+						item.casts = item.casts.map(function(ele, i) {
+							return ele.name
+						}).join('/')
+					})
+					return data
+				}
+			})();
+		</script>
+	</body>
+
+</html>

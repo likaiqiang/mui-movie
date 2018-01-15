@@ -1,0 +1,140 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link href="../css/style.css" rel="stylesheet" />
+		<style type="text/css">
+			/*排序数字样式*/
+			
+			.top-index {
+				color: red;
+				font-size: 16px;
+				font-style: italic;
+				width: 30px;
+				display: inline-block;
+				margin-top: 40px;
+				margin-bottom: 15px;
+			}
+			/*线的样式*/
+			
+			.line {
+				width: 50px;
+				height: 0.5px;
+				background: #C4C4C4;
+				display: inline-block;
+				vertical-align: middle;
+			}
+			/*card样式*/
+			
+			.card {
+				margin-left: 15px;
+				margin-right: 15px;
+				height: 120px;
+				border: 1px solid #C4C4C4;
+				border-radius: 2px;
+				box-shadow: 0px 1px 5px #C4C4C4;
+				padding: 15px;
+				text-align: left;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">北美票房榜</h1>
+		</header>
+		<div class="mui-content">
+			<ul id="list" style="list-style: none;padding-left: 1px;margin-top: 0px;background: white;">
+				<li v-for="(item,index) in list" :key="index" @tap="open_detail(item.id)">
+					<div style="text-align: center;">
+						<div class="line"></div>
+						<div class="top-index">{{item.sort}}</div>
+						<div class="line"></div>
+					</div>
+					<div class="card">
+						<img :src="item.cover" class="mui-pull-left" style="width: 70px;height: 95px;margin-right: 10px;" />
+						<div class="dark-big">{{item.title}}</div>
+						<div style="line-height: 20px;">
+							<span class="gray-small">豆瓣评分：</span><span class="orange-small">{{item.score}}分</span>
+						</div>
+						<span class="gray-small mui-ellipsis" style="display: block;line-height: 20px;">
+			        				导演：{{item.directorsStr}}
+			        			</span>
+						<span class="gray-small mui-ellipsis" style="display: block;line-height: 20px;">
+			        				演员：{{item.castsStr}}
+			        			</span>
+					</div>
+					<span class="dark-medium" style="margin-left: 15px;margin-top: 10px;display: block;">票房{{item.box/10000}}万美元</span>
+				</li>
+			</ul>
+		</div>
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/vue.min.js.js"></script>
+		<script type="text/javascript">
+			!(function() {
+				mui.init()
+				var vm = null
+
+				function ready() {
+					var movieDetails = mui.preload({
+						id: 'movie-details',
+						url: './movie-details.html'
+					})
+					vm = new Vue({
+						el: '.mui-content',
+						data: {
+							list: []
+						},
+						created: function() {
+							this.getData()
+						},
+						methods: {
+							getData: function() {
+								var _this = this
+								plus.nativeUI.showWaiting()
+								mui.getJSON('http://api.douban.com/v2/movie/us_box', function(res) {
+									console.log(res)
+									plus.nativeUI.closeWaiting()
+									_this.list = res.subjects.map(function(item, index) {
+										var directorsStr = item.subject.directors.map(function(d) {
+											return d.name
+										}).join('/')
+										var castsStr = item.subject.casts.map(function(d) {
+											return d.name
+										}).join('/')
+										return {
+											title: item.subject.title,
+											score: item.subject.rating.average,
+											directorsStr: directorsStr,
+											castsStr: castsStr,
+											sort: item.rank,
+											cover: item.subject.images.medium,
+											box: item.box,
+											id: item.subject.id
+										}
+									})
+									console.log(_this.list)
+								})
+							},
+							open_detail: function(id) {
+								mui.fire(movieDetails,'movieId',{
+									id:id
+								})
+								mui.openWindow({
+									id:'movie-details'
+								})
+							}
+						}
+					})
+				}
+				mui.plusReady(ready)
+			})()
+		</script>
+	</body>
+
+</html>

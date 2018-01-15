@@ -1,0 +1,193 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="../css/style.css"/>
+		<script src="../js/vue.min.js.js"></script>
+		<style type="text/css">
+			.top-image-block {
+				text-align: center;
+				padding-top: 10px;
+				padding-bottom: 10px;
+				background: #3C3C3C;
+			}
+			
+			.mui-bar-nav {
+				-webkit-box-shadow: none;
+				box-shadow: none;
+			}
+			
+			.mui-ellipsis-4 {
+				display: -webkit-box;
+				overflow: hidden;
+				white-space: normal !important;
+				text-overflow: ellipsis;
+				word-wrap: break-word;
+				-webkit-line-clamp: 4;
+				-webkit-box-orient: vertical;
+			}
+			
+			.comment-head-photo {
+				width: 30px;
+				height: 30px;
+				border-radius: 30px;
+			}
+			
+			.mui-table-view {
+				position: relative;
+				margin-top: 0;
+				margin-bottom: 0;
+				padding-left: 0;
+				list-style: none;
+				background-color: #EFEFF4;
+			}
+			
+			.mui-table-view:before {
+				position: absolute;
+				top: 0;
+				right: 0;
+				left: 0;
+				height: 0px;
+				content: '';
+				-webkit-transform: scaleY(.5);
+				transform: scaleY(.5);
+				background-color: #c8c7cc;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">电影</h1>
+		</header>
+		<div class="mui-content" style="background: white;" id="content">
+			<div class="top-image-block">
+				<img :src="movieDetails.images" style="width: 160px;height: 240px;vertical-align: top;" />
+			</div>
+			<div style="padding: 15px;height: 90px;">
+				<div style="float: left;">
+					<span class="dark-big" style="display: block;">{{movieDetails.title}}</span>
+					<span class="gray-small">{{movieDetails.year}} / {{movieDetails.countries}} / {{movieDetails.genres}}</span>
+					<span class="gray-small" style="display: block;">{{movieDetails.directors}}导演作品</span>
+				</div>
+				<div style="width: 60px;height: 60px;background: white;float: right;text-align: center;box-shadow: 0px 0px 10px #aaaaaa;">
+					<span class="gray-micro" style="display: block;vertical-align: middle;margin-top: 5px;line-height: 15px;">豆瓣评分</span>
+					<span class="dark-big" style="display: block;line-height: 20px;">{{movieDetails.score}}</span>
+					<span class="gray-micro" style="display: block;line-height: 15px;">{{movieDetails.ratingCount}}人</span>
+				</div>
+			</div>
+			<div style="height: 0.5px;background: #A2A2A2;margin-left: 15px;"></div>
+			<p class="gray-small" style="margin: 10px 0px 0px 15px;">剧情简介</p>
+			<p class="dark-medium mui-ellipsis-4" style="margin: 0px 15px 0px 15px;">{{movieDetails.summary}}</p>
+			<p class="gray-small" style="margin: 10px 0px 0px 15px;">演员</p>
+			<div style="overflow-x: scroll;white-space: nowrap;padding-left: 15px;" v-if="movieDetails.casts">
+				<div v-for="item in movieDetails.casts" style="display: inline-block;" @tap="openDetail(item)">
+					<img :src="item.avatars.medium" style="width: 70px;height: 100px;margin-right: 10px;" />
+					<div class="dark-micro mui-ellipsis" style="width: 70px;text-align: center;">{{item.name}}</div>
+				</div>
+			</div>
+			<!--<p class="dark-medium" style="margin-top: 10px;text-align: center;background: #E6E6E6;line-height: 40px;">精彩话题</p>
+			<ul class="mui-table-view" style="background: white;">
+				<li class="mui-table-view-cell">
+					<img src="../images/icon_commentphoto.jpg" class="comment-head-photo mui-pull-left" />
+					<div>
+						<span class="dark-medium" style="line-height: 30px;text-align: center;margin-left: 10px;">xxxx的影评</span>
+						<span class="gray-medium" style="line-height: 30px; text-align: center;float: right;">2017-12-30</span>
+					</div>
+					<p class="dark-medium" style="margin-left: 40px;">
+						这部电影非常棒！
+					</p>
+				</li>
+				<li class="mui-table-view-cell">
+					<img src="../images/icon_commentphoto.jpg" class="comment-head-photo mui-pull-left" />
+					<div>
+						<span class="dark-medium" style="line-height: 30px;text-align: center;margin-left: 10px;">Hello World</span>
+						<span class="gray-medium" style="line-height: 30px; text-align: center;float: right;">2017-12-30</span>
+					</div>
+					<p class="dark-medium" style="margin-left: 40px;">
+						这部电影非常棒！
+					</p>
+				</li>
+				<li class="mui-table-view-cell">
+					<img src="../images/icon_commentphoto.jpg" class="comment-head-photo mui-pull-left" />
+					<div>
+						<span class="dark-medium" style="line-height: 30px;text-align: center;margin-left: 10px;">Hello World</span>
+						<span class="gray-medium" style="line-height: 30px; text-align: center;float: right;">2017-12-30</span>
+					</div>
+					<p class="dark-medium" style="margin-left: 40px;">
+						这部电影非常棒！
+					</p>
+				</li>
+			</ul>-->
+		</div>
+		<script src="../js/mui.min.js"></script>
+		<script type="text/javascript">
+			!(function(){
+				var movieId,
+					waiting,
+					casts
+				var vm = new Vue({
+					el:"#content",
+					data:{
+						movieDetails:{}
+					},
+					methods:{
+						openDetail:openDetail
+					}
+				})
+				mui.init()
+				function getData(id){
+					mui.getJSON('https://api.douban.com/v2/movie/subject/'+movieId,{},function(res){
+						processData(res)
+						plus.nativeUI.closeWaiting()
+					})
+				}
+				function processData(res){
+					vm.$set(vm.movieDetails,'images',res.images.medium)
+					vm.$set(vm.movieDetails,'title',res.title)
+					vm.$set(vm.movieDetails,'year',res.year)
+					vm.$set(vm.movieDetails,'countries',res.countries.toString().replace(/,/g,' / '))
+					vm.$set(vm.movieDetails,'genres',res.genres.toString().replace(/,/g,' / '))
+					vm.$set(vm.movieDetails,'directors',res.directors.length>0?res.directors[0].name:'')
+					vm.$set(vm.movieDetails,'ratingCount',res.ratings_count>0?res.ratings_count:'暂无评论')
+					vm.$set(vm.movieDetails,'score',res.rating.average)
+					vm.$set(vm.movieDetails,'summary',res.summary)
+					vm.$set(vm.movieDetails,'casts',res.casts)
+				}
+				function ready(){
+					var self = plus.webview.currentWebview()
+					casts = mui.preload({
+						url:'./casts-details.html',
+						id:'casts-details.html'
+					})
+					self.addEventListener('hide',function(){
+						window.scrollTo(0,0)
+						vm.movieDetails = {}
+					})
+					window.addEventListener('movieId',function(e){
+						movieId = e.detail.id
+						waiting = plus.nativeUI.showWaiting('加载中',{
+							width:"100px",
+							height:"100px"
+						})
+						getData(movieId)
+					})
+				}
+				function openDetail(item){
+					mui.fire(casts,'castsId',{
+						id:item.id
+					})
+					mui.openWindow({
+						id:'casts-details.html'
+					})
+				}
+				mui.plusReady(ready)
+			})()
+		</script>
+	</body>
+
+</html>

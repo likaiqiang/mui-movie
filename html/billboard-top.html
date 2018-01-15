@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link href="../css/style.css" rel="stylesheet" />
+		<style type="text/css">
+			.top-nav {
+				background: white
+			}
+			/*排序数字样式*/
+			
+			.top-index {
+				color: red;
+				font-size: 16px;
+				font-style: italic;
+				width: 30px;
+				display: inline-block;
+				margin-top: 40px;
+				margin-bottom: 15px;
+			}
+			/*线的样式*/
+			
+			.line {
+				width: 50px;
+				height: 0.5px;
+				background: #C4C4C4;
+				display: inline-block;
+				vertical-align: middle;
+			}
+			/*card样式*/
+			
+			.card {
+				margin-left: 15px;
+				margin-right: 15px;
+				height: 120px;
+				border: 1px solid #C4C4C4;
+				border-radius: 2px;
+				box-shadow: 0px 1px 5px #C4C4C4;
+				padding: 15px;
+				text-align: left;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">豆瓣Top250</h1>
+		</header>
+		<div class="mui-content" style="background: white;">
+			<div class="top-nav">
+				<div id="nav" class="mui-segmented-control mui-segmented-control-inverted">
+					<a :class="['mui-control-item',{'mui-active':curMenuIndex==index}]" :tabindex="index+1" v-for="(item,index) in menu" @tap="menuClick(index)">{{item.name}}</a>
+				</div>
+				<div style="height: 0.5px;background: #C4C4C4;"></div>
+			</div>
+			<div id="list" class="mui-scroll-wrapper" style="top:84.5px;background: white;">
+				<div class="mui-scroll">
+					<ul style="list-style: none;padding-left: 1px;margin-top: 0px;">
+						<li v-for="item in list">
+							<div style="text-align: center;">
+								<div class="line"></div>
+								<div class="top-index">{{item.sort}}</div>
+								<div class="line"></div>
+							</div>
+							<div class="card">
+								<img :src="item.cover" class="mui-pull-left" style="width: 70px;height: 95px;margin-right: 10px;" />
+								<div class="dark-big">{{item.title}}</div>
+								<div style="line-height: 20px;">
+									<span class="gray-small">豆瓣评分：</span><span class="orange-small">{{item.score}}分</span>
+								</div>
+								<span class="gray-small mui-ellipsis" style="display: block;line-height: 20px;">
+			        				导演：{{item.directors}}
+			        			</span>
+								<span class="gray-small mui-ellipsis" style="display: block;line-height: 20px;">
+			        				演员：{{item.casts}}
+			        			</span>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+		</div>
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/vue.min.js.js"></script>
+		<script type="text/javascript">
+			!(function() {
+				mui.init()
+				var vm = null
+				mui.plusReady(ready)
+				function ready() {
+					vm = new Vue({
+						el: ".mui-content",
+						data: {
+							list: [],
+							curMenuIndex: 0,
+							menu: [{
+									name: "Top1-50",
+									value: 0
+								},
+								{
+									name: "51-100",
+									value: 50
+								},
+								{
+									name: "101-150",
+									value: 100
+								},
+								{
+									name: "151-200",
+									value: 150
+								},
+								{
+									name: "201-250",
+									value: 100
+								}
+							]
+						},
+						created: function() {
+							this.getList()
+						},
+						methods: {
+							getList: function() {
+								var _this = this
+								plus.nativeUI.showWaiting()
+								mui.getJSON('http://api.douban.com/v2/movie/top250', {
+									start: _this.menu[_this.curMenuIndex].value,
+									count: 50
+								}, function(res) {
+									_this.list = res.subjects.map(function(item, index) {
+										return {
+											title: item.title,
+											cover: item.images.medium,
+											score: item.rating.average,
+											directors: item.directors.map(function(d) {
+												return d.name
+											}).join('/'),
+											casts: item.casts.map(function(d) {
+												return d.name
+											}).join('/')
+										}
+									})
+									plus.nativeUI.closeWaiting()
+									mui('.mui-scroll-wrapper').scroll().scrollTo(0, 0, 100);
+								});
+							},
+							menuClick:function(index){
+								this.curMenuIndex = index
+								this.getList()
+							}
+						}
+					})
+				}
+			})()
+		</script>
+	</body>
+
+</html>

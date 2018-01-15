@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="../css/style.css"/>
+		<script src="../js/vue.min.js.js"></script>
+		<style type="text/css">
+			/*顶部样式*/
+			.top-image-block{
+				text-align: center;
+				padding-top: 10px;
+				padding-bottom: 10px;
+				background: #18D7D7;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">影人</h1>
+		</header>
+		<div class="mui-content">
+		    <div class="top-image-block">
+		    		<img :src="casts.avatars" style="width: 160px;height: 240px;vertical-align: top;"/>
+		    </div>
+		    
+		    <div style="padding: 15px;">
+	    		<div class="dark-big">
+	    			{{casts.name}}
+	    		</div>
+	    		<div class="gray-medium">
+	    			{{casts.name_en}}
+	    		</div>
+	    		<div class="gray-small">
+	    			个人简介
+	    		</div>
+	    		<div class="dark-medium">
+	    			{{casts.summary}}
+	    		</div>
+		    </div>
+		    
+		    <div class="gray-small" style="padding-left: 15px;">
+		    		代表作品
+		    </div>
+		    <div style="overflow-x: scroll;white-space: nowrap;padding-left: 15px;" v-if="casts.works">
+	    		<div v-for="item in casts.works" style="display: inline-block;">
+	    			<img :src="item.cover" style="width: 70px;height: 100px;margin-right: 10px;"/>
+	    			<div class="dark-micro mui-ellipsis" style="width: 70px;text-align: center;">
+	    				{{item.title}}
+	    			</div>
+	    			<div class="orange-small mui-ellipsis" style="width: 70px;text-align: center;line-height: 15px;">
+	    				{{item.rating}}分
+	    			</div>
+	    		</div>
+		    </div>
+		</div>
+		<script src="../js/mui.min.js"></script>
+		<script type="text/javascript">
+			mui.init()
+			var vm = new Vue({
+				el:".mui-content",
+				data:{
+					casts:{}
+				}
+			})
+			var waiting
+			function getData(id){
+				mui.getJSON('https://api.douban.com/v2/movie/celebrity/'+id,{},function(res){
+					processData(res)
+					waiting.close()
+				})
+			}
+			function processData(data){
+				vm.$set(vm.casts,'summary',data.name+'，'+data.gender+'，'+data.born_place)
+				vm.$set(vm.casts,'name',data.name)
+				vm.$set(vm.casts,'name_en',data.name_en)
+				vm.$set(vm.casts,'avatars',data.avatars.medium)
+				var works = data.works.map(function(item,index){
+					return {
+						cover:item.subject.images.medium,
+						title:item.subject.title,
+						rating:item.subject.rating.average
+					}
+				})
+				vm.$set(vm.casts,'works',works)
+			}
+			mui.plusReady(function(){
+				window.addEventListener('castsId',function(e){
+					waiting = plus.nativeUI.showWaiting()
+					getData(e.detail.id)
+				})
+				var self = plus.webview.currentWebview()
+				self.addEventListener('hide',function(){
+					vm.casts = {}
+				})
+			})
+		</script>
+	</body>
+
+</html>
