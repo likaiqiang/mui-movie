@@ -104,40 +104,6 @@
 					});
 				});
 				//				mui('.mui-scroll-wrapper').scroll({})
-				function refreshUp() {
-					mui.getJSON('https://api.douban.com/v2/movie/in_theaters', {
-						start: vm.movie.length,
-						count: 10
-					}, function(res) {
-						vm.movie = vm.movie.concat(processData(res.subjects))
-						mui('#refreshContainer').pullRefresh().endPullupToRefresh(vm.movie.length > res.total);
-					})
-				}
-
-				function refreshDown() {
-					mui.getJSON('https://api.douban.com/v2/movie/in_theaters', {
-
-					}, function(res) {
-						console.log('down')
-						vm.movie = []
-						vm.movie = processData(res.subjects)
-						mui('#refreshContainer').pullRefresh().endPulldown();
-						//						mui('#refreshContainer').pullRefresh().refresh(true);
-					})
-				}
-
-				function processData(data) {
-					data.forEach(function(item, index) {
-						item.genres = item.genres.join('/')
-						item.directors = item.directors.map(function(ele, i) {
-							return ele.name
-						}).join('/')
-						item.casts = item.casts.map(function(ele, i) {
-							return ele.name
-						}).join('/')
-					})
-					return data
-				}
 			})();
 		</script>
 	</body>
